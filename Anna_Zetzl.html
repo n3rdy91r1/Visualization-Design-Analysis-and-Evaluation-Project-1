@@ -1,0 +1,396 @@
+<html>
+    <head>
+        <title> </title>
+        <script src = "https://d3js.org/d3.v3.min.js"> </script>
+        <script> 
+
+        function visitHomePage(){
+            window.location='Home_Page.html';
+        }
+        function visitDocPage(){
+            window.location='Doc_Page.html';
+        }
+        function visitVisPage(){
+            window.location='Anna_Zetzl.html';            
+        }    
+        </script>
+
+    </head>
+    <body>
+        <div>
+            <button type="button" class="button one" onclick="visitHomePage()">Home</button>
+
+            <button type="button" class="button one" onclick="visitDocPage()">Documentation</button>
+
+            <button type="button" class="button one" onclick="visitVisPage()">Visualization</button>
+        </div>
+
+        
+        <svg width = '2000' height = '2000'>
+            <text id="label" x="5" y="25"> 1854 Cholera Epidemic </text>
+            <ellipse rx = '5' ry = '5' cx = '20' cy = '45' fill = 'rgba(215,28,139,1.0)' stroke = '#000000'> </ellipse><text x="50" y="50"> Ellipse - Pump</text> 
+            <circle cx = '10' cy ='85' r = '5' fill = 'rgba(12,104,75,1.0)'> </circle> <circle cx = '35' cy = '85' r = '5' fill ='rgba(152,51,8,1.0)'></circle><text x="50" y="90"> Circle - Death. Orange = female Green = Male. Darker = Younger </text> 
+
+            <g transform="translate(30,40)"> </g>
+            <text id="timeline_label" x="20" y="550" onclick="timeInfo()"> Deaths per Day - Hover over a bar to select a day! </text>
+            
+
+        </svg>
+
+        
+
+        <script>
+            var CHART_WIDTH = 100;
+            var CHART_HEIGHT = 100;
+
+            var pumpXValue = [];
+
+            var pumpYValue = [];
+
+            var pumpCoord = [];
+
+            var streetCoord = [];
+            
+            var deathDemoData = [];
+
+            var deathTimeData = [];
+
+            var deathdays = [];
+
+            var deathsforMaxVal = [];
+
+            var scale = d3.scale.linear().domain([0, 100]).range([0, 2500]);
+
+
+
+
+            function drawPumps() {
+                //var xScale = d3.scale.linear().domain([0, d3.max(data, function(d) { return d[0] * 25; })]).range([0, w]);
+                //var yScale = d3.scale.linear().domain([0, d3.max(data, function(d) { return d[1] * 25; })]).range([0, h]);
+                var selection = d3.select('svg')
+                .select('g')
+                .selectAll('ellipse')
+                .data(pumpCoord);
+
+
+                selection.enter()
+                    .append('ellipse')
+                    .attr('rx', 10)
+                    .attr('ry', 10)
+                    .attr('cx', function(d){
+                        return scale(d[0]);
+                    })
+                    .attr('cy', function(d){
+                        return scale(d[1]);
+                    })
+                    .attr('fill', 'rgba(215,28,139,1.0)')
+                    .attr("stroke", "#000000")
+            }
+
+
+            function drawDeaths(){
+                //var selection = d3.select
+                //loading json data - page 87
+                d3.selectAll('circle')
+                var selection = d3.select('svg')
+                .select('g')
+                .selectAll('circle')
+                .data(deathDemoData);
+                //1 draw deaths + sex (color?)
+
+                selection.enter()
+                    .append('circle')
+                    .attr('cx', function(d){
+                        return scale(d[0]);
+                    })
+                    .attr('cy', function(d){
+                        return scale(d[1]);
+                    })
+                    .attr('fill', function(d){
+                        return 'rgba('+d[2] +', ' + '1.0)';
+                    })
+                    .attr("r", 3)
+                
+
+
+                //Conditional - show deaths based on day group
+
+                
+
+
+            }
+
+            function drawStreets(){
+                //
+                console.log('Function is being called')
+                var selection = d3.select('svg')
+                .select('g')
+                .selectAll('line')
+                .data(streetCoord);
+
+                selection.enter()
+                    .append('line')
+                    .style("stroke", "black")
+                    .attr('x1', function(d){
+                        return scale(d[0][0]);
+                    })
+                    .attr('x2', function(d){
+                        return scale(d[1][0]);
+                    })
+                    .attr('y1', function(d){
+                        return scale(d[0][1]);
+                    })
+                    .attr('y2', function(d){
+                        return scale(d[1][1]);
+                    })
+                    
+            }
+
+            var BAR_WIDTH = 15;
+            var MAX_BAR_HEIGHT = 50;
+            var death_date = '29-Sep';
+
+
+            function drawChart() {
+                
+
+                var maxValue = d3.max(deathsforMaxVal);
+
+                d3.selectAll('rect').remove();
+
+
+
+                var selection = d3.select('svg').select('g').selectAll('rect').data(deathdays);
+
+                var rectangles = selection.enter().append('rect');
+                rectangles.on('mouseover', function(d, i){
+                    console.log(d[0])
+                    death_date = d[0]
+                    
+                    d3.csv('deathdays.csv', function(data) {
+                        iterator = 0;
+
+
+                        for (let r in data) {
+                            var day = data[r]['date'];
+                            //console.log(day);
+                            var deaths = data[r]['deaths'];
+                            iterator = iterator + Number(deaths);
+                            console.log(deaths)
+
+                            // if date is equal to deathtimedata stop loop
+
+
+                            
+                            var deathdata = [day, deaths];
+                            deathdays.push(deathdata);
+                            deathsforMaxVal.push(deaths);
+
+                            // stop loop here
+                            var record = data[0];
+                            if (day == death_date){
+                                death_values = iterator;
+
+                            }
+                        }
+                    });
+                    readDeathDemo();
+                    drawDeaths();
+                    document.getElementById('timeline_label').innerHTML
+                        = 'Day: ' + d[0] + " Amount of Deaths: " + d[1];
+                    
+
+  
+                });
+                
+                rectangles.attr('width', BAR_WIDTH);
+                rectangles.attr('fill', "Blue");
+                
+                rectangles.attr('x', function(d, i) {
+                    //console.log(i * BAR_WIDTH);
+                    return i * BAR_WIDTH;
+                
+                })
+                
+                rectangles.attr('height', function(d) 
+                {
+                    
+                    var n = d[1] / maxValue;
+                    var val = n * MAX_BAR_HEIGHT;
+
+                    return val;
+
+
+                });
+
+                rectangles.attr('y', function(d) 
+                {
+                    var n = 1 - (d[1] / maxValue);
+                    var val = (n * MAX_BAR_HEIGHT);
+                    // if n * MAX_BAR_HEIGHT > 500 val = 500 + 800
+
+
+
+
+
+
+
+                    return val + 1400;
+
+                });
+            }
+
+            
+            var death_values = [];
+            
+            function readChart(){
+                d3.csv('deathdays.csv', function(data) {
+                iterator = 0;
+
+
+                for (let r in data) 
+                {
+                    //console.log(data[r]);
+                    var day = data[r]['date'];
+                    //console.log(day);
+                    var deaths = data[r]['deaths'];
+                    iterator = iterator + Number(deaths);
+                    console.log(deaths)
+
+                    // if date is equal to deathtimedata stop loop
+
+
+                    
+                    var deathdata = [day, deaths];
+                    deathdays.push(deathdata);
+                    deathsforMaxVal.push(deaths);
+
+                    // stop loop here
+                    var record = data[0];
+                    if (day == death_date){
+                        death_values = iterator;
+
+                    };
+                }
+                drawChart();
+
+
+
+
+
+                // make histogram with day as x and deaths as y
+
+
+
+            })};
+            readChart();
+            
+
+            function readDeathDemo(){
+                d3.csv('deaths_age_sex.csv', function(data) {
+                //Death timeline idea
+
+                // get data from graph - [day, num of deaths]  
+                var iterator = 0;
+                deathDemoData = [];
+
+                d3.selectAll('circle').remove()
+
+                            
+
+                for (let r in data) {
+                    // when you click on a bar the graph will show deaths up to that day
+                    //console.log();
+                    if (iterator == death_values){
+                        break;
+                    }
+                    iterator = iterator + 1;
+                    console.log(iterator);
+                    
+                    var xval = data[r]['x'];
+                    var yval = data[r]['y'];
+                    var age = data[r]['age'];
+                    var gender = data[r]['gender'];
+                    var color = [];
+                    if (gender == '0') {
+                        color = [12,104,75];
+                        color[0] = color[0] + (30 * age);
+                        color[1] = color[1] + (25 * age);
+                        color[2] = color[2] + (30 * age);
+
+                    }
+                    if (gender == '1') {
+                        color = [152,51,8];
+                        color[0] = color[0] + (20 * age);
+                        color[1] = color[1] + (25 * age);
+                        color[2] = color[2] + (25 * age);
+                    }
+ 
+
+                    info = [xval, yval, color];
+                    deathDemoData.push(info);
+
+                    console.log("rgba(" + color + ")");
+                    
+                }
+                drawDeaths();
+                
+            })};
+            readDeathDemo();
+
+            d3.json('streets.json', function(json){
+                console.log(json);
+                for (let r in json){
+                    //console.log(json[r]);
+
+                    var data = json[r];
+                    var i = 0;
+
+                    while (i < (data.length-1)){
+                        var startcoord = [data[i]['x'], data[i]['y']];
+                        //console.log(data[i]['x']);
+                        var endcoord = [data[i+1]['x'], data[i+1]['y']];
+                        streetCoord.push([startcoord, endcoord]);
+                        i++;
+                    }
+                }
+                drawStreets();
+            })
+
+            d3.csv('pumps.csv', function(data)
+            {
+                var xValues = data[0];
+                var yValues = data[1];
+                console.log(xValues)
+                console.log(yValues)
+                //var xScale = d3.scale.linear().domain([0, d3.max(data, function(d) { return d[0] * 25; })]).range([0, w]);
+                //var yScale = d3.scale.linear().domain([0, d3.max(data, function(d) { return d[1] * 25; })]).range([0, h]);
+                
+
+                
+
+                for (let r in data) {
+                    
+                    
+                    xval = data[r]['x'];
+                    yval = data[r]['y'];
+
+                    coord = [xval, yval]
+                    pumpCoord.push(coord)
+
+                    pumpXValue.push(+xval);
+                    pumpYValue.push(+yval);
+                    
+                }
+                drawPumps();
+                
+            })
+
+
+            
+            // when you click on a bar the graph will show deaths up to that day
+
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <title> Documentation Page </title>
+
+        <script> 
+
+            function visitHomePage(){
+                window.location='Home_Page.html';
+            }
+            function visitDocPage(){
+                window.location='Doc_Page.html';
+            }
+            function visitVisPage(){
+                window.location='Anna_Zetzl.html';            
+            }    
+        </script>
+
+    </head>
+    <body>
+        <div>
+            <button type="button" class="button one" onclick="visitHomePage()">Home</button>
+
+            <button type="button" class="button one" onclick="visitDocPage()">Documentation</button>
+
+            <button type="button" class="button one" onclick="visitVisPage()">Visualization</button>
+        </div>
+        <!-- Work description -->
+
+        <p>
+            For this visualization, my first order of business was simply getting black and white map data onto the page. My first issue was that I could extract coordinate 
+            data onto the page, but it turned out to be quite small. The is where the chapter of the book on scaling came quite in handy. I used a function to scale everything
+            up 25 times, and that seemed to do the trick. <br>
+            The second thing to complete was deciding on colors and shapes for my elements. My idea for my color scheme came from the color brewer resource provided by the course 
+            website. I decided on orange (Female/1) and green (Male/0). I decided to use darkness/lightness for age to accomodate the larger number of classes. The darker the color, the younger
+            the age group is. 
+            The pumps got the remaining color, and I decided to put in a black border to make them stand out more. I also purposefully made the size slightly larger than the death 
+            elements. <br>
+            The next thing to get working was the timeline graph and being able to update based on which day you hover on. My biggest issue here was dealing with removing elements.
+            I had done the required reading for this, but had some difficulty putting it into execution. What I ended up selecting all the deaths (circles) and using .remove().<br>
+            
+            I also used the below graphs in my analysis, which show death distributions by sex and age. As you can see, it appears that death percentage is about the same when 
+            comparing by sex. However, deaths appear to be much higher in the oldest and youngest age groups.
+        </p>
+
+        <img src="Death_Age_Dist.png" alt="Age distribution" width="650" height="500">
+        <img src="Death_Sex.png" alt="Sex distribution" width="650" height="500">
+
+
+
+        <p> The following video shows the use of the visualization </p>     
+
+        <!-- Youtube Video -->
+
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/Jdnz_GeMbvY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        
+    </body>
+</html>
